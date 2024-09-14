@@ -1,8 +1,9 @@
 #include "main.h"
+#include "util.h"
 #include <ncurses.h>
 #include <string.h>
 
-WINDOW *create_newwin(int height, int width, int starty, int startx);
+WINDOW *create_newwin(int height, int width, int starty, int startx, int color);
 void destroy_win(WINDOW *local_win);
 
 int main(void) {
@@ -26,10 +27,11 @@ int main(void) {
     }
 
     start_color();
+    init_pair(1, COLOR_BLACK, COLOR_RED);
 
     refresh();
     // Create main window
-    main_window = create_newwin(LINES - 1, COLS - 1, 0, 0);
+    main_window = create_newwin(LINES - 1, COLS - 1, 0, 0, 1);
 
     ch = getch();
 
@@ -50,25 +52,4 @@ int main(void) {
     endwin();
 
     return 0;
-}
-
-WINDOW *create_newwin(int height, int width, int starty, int startx) {
-    WINDOW *local_win;
-
-    local_win = newwin(height, width, starty, startx);
-
-    init_pair(1, COLOR_BLACK, COLOR_CYAN);
-    wbkgd(local_win, COLOR_PAIR(1));
-    box(local_win, 0, 0);
-    wrefresh(local_win);
-
-    return local_win;
-}
-
-void destroy_win(WINDOW *local_win)
-{	
-	wborder(local_win, ' ', ' ', ' ',' ',' ',' ',' ',' ');
-
-	wrefresh(local_win);
-	delwin(local_win);
 }

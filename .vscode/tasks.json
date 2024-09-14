@@ -11,10 +11,10 @@
                 "-g",
                 "-I${workspaceFolder}/include",
                 "-I/usr/local/include",
-                "${file}",
+                "${workspaceFolder}/src/*.c",
                 "-lncurses",
                 "-o",
-                "${workspaceFolder}/bin/${fileBasenameNoExtension}"
+                "${workspaceFolder}/bin/main"
             ],
             "options": {
                 "cwd": "${fileDirname}"
