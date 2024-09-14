@@ -22,3 +22,12 @@ void destroy_win(WINDOW *local_win)
 	wrefresh(local_win);
 	delwin(local_win);
 }
+
+void info_log(const char * text) {
+    // Clear remains of any previous logs
+    move(LINES - 1, 0);
+    clrtoeol();
+    // Print new log
+    mvwprintw(stdscr, LINES - 1, 0, text);
+    wrefresh(stdscr);
+}

@@ -1,5 +1,6 @@
 #include "main.h"
 #include "util.h"
+#include "mainmenu.h"
 #include <ncurses.h>
 #include <string.h>
 
@@ -19,6 +20,8 @@ int main(void) {
     keypad(stdscr, TRUE);
     // Disable line buffering
     raw();
+    // Disable cursor
+    curs_set(0);
 
     if (!has_colors()) {
         endwin();
@@ -33,19 +36,8 @@ int main(void) {
     // Create main window
     main_window = create_newwin(LINES - 1, COLS - 1, 0, 0, 1);
 
-    ch = getch();
-
-    if (ch == KEY_LEFT) {
-        attron(A_BOLD);
-        char mesg[] = "GAME READY!";
-        mvwprintw(main_window, LINES/2, (COLS-strlen(mesg))/2,"%s", mesg);
-        attroff(A_BOLD);
-    } else {
-        attron(A_ITALIC);
-        char mesg[] = "Unhandled Input: ";
-        mvwprintw(main_window, LINES/2, (COLS-strlen(mesg) + 1)/2,"%s%c", mesg, ch);
-        attroff(A_ITALIC);
-    }
+    // Start main menu
+    menu_main();
 
     wrefresh(main_window);
     getch();
