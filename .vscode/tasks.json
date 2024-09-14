@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "type": "cppbuild",
+            "type": "shell",
             "label": "C/C++: clang build active file",
             "command": "/usr/bin/clang",
             "args": [
@@ -10,8 +10,9 @@
                 "-fansi-escape-codes",
                 "-g",
                 "-I${workspaceFolder}/include",
-                "-Incurses",
+                "-I/usr/local/include",
                 "${file}",
+                "-lncurses",
                 "-o",
                 "${workspaceFolder}/bin/${fileBasenameNoExtension}"
             ],
