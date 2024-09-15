@@ -1,11 +1,9 @@
 #include "mainmenu.h"
 #include "util.h"
+#include "game.h"
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define BUTTON_COLOR 2
-#define BUTTON_SELECT_COLOR 3
 
 // Menu Options
 typedef enum {
@@ -19,13 +17,9 @@ typedef enum {
 WINDOW *make_btn(const char * text, int position);
 
 // Init the main menu
-void menu_main() {
+void menu_main(WINDOW *main_window) {
     WINDOW *startButton, *savesButton, *settingsButton, *quitButton;
     MenuOption selectedIndex = START;
-
-    // Setup button colors
-    init_pair(BUTTON_COLOR, COLOR_BLACK, COLOR_MAGENTA);
-    init_pair(BUTTON_SELECT_COLOR, COLOR_MAGENTA, COLOR_BLACK);
 
     // Create buttons
     startButton = make_btn("START", 0);
@@ -84,6 +78,15 @@ void menu_main() {
                 // User has activated selected button
                 switch (selectedIndex) {
                     case START:
+                        game_main();
+
+                        // Make sure the main menu actually shows up again
+                        touchwin(main_window);
+                        wrefresh(main_window);
+                        for (int i = 0; i < 4; i++) {
+                            touchwin(buttons[i]);
+                            wrefresh(buttons[i]);
+                        }
                         break;
                     case SAVES:
                         break;

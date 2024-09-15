@@ -6,6 +6,7 @@
 
 WINDOW *create_newwin(int height, int width, int starty, int startx, int color);
 void destroy_win(WINDOW *local_win);
+WINDOW *main_window;
 
 int main(void) {
     // Variables
@@ -29,15 +30,20 @@ int main(void) {
         return 1;
     }
 
+    // Setup Colors
     start_color();
-    init_pair(1, COLOR_BLACK, COLOR_RED);
+    init_pair(SCREEN_COLOR, COLOR_BLACK, COLOR_BLUE);
+    init_pair(BUTTON_SELECT_COLOR, COLOR_BLACK, COLOR_CYAN);
+    init_pair(BUTTON_COLOR, COLOR_CYAN, COLOR_BLACK);
+    init_pair(KEY_COLOR, COLOR_BLACK, COLOR_WHITE);
+    init_pair(CONTROLS_SCREEN_COLOR, COLOR_WHITE, COLOR_BLACK);
 
     refresh();
     // Create main window
-    main_window = create_newwin(LINES - 1, COLS - 1, 0, 0, 1);
+    main_window = create_newwin(LINES - 1, COLS - 1, 0, 0, SCREEN_COLOR);
 
     // Start main menu
-    menu_main();
+    menu_main(main_window);
 
     wrefresh(main_window);
     getch();
