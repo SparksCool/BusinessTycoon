@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.php": "html",
+        "menu.h": "c"
+    }
+}
