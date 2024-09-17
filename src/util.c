@@ -31,3 +31,36 @@ void info_log(const char * text) {
     mvwprintw(stdscr, LINES - 1, 0, text);
     wrefresh(stdscr);
 }
+
+struct saveData read_save(const char * filename) { 
+    // Save data
+    struct PlayerBusiness player;
+    struct Business *businesses;
+    struct Property *properties;
+    int day;
+
+
+    
+
+    struct saveData data = {
+        .player = player,
+        .businesses = businesses,
+        .properties = properties,
+        .currentDay = day
+    };
+
+    return data;
+}
+
+void write_save(struct saveData data, const char * filename) {
+    // Save data
+    struct PlayerBusiness player = data.player;
+    struct Business *businesses = data.businesses;
+    struct Property *properties = data.properties;
+    int day = data.currentDay;
+
+    FILE *of;
+    of = fopen(filename, "w");
+
+    
+}
