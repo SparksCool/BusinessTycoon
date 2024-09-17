@@ -22,7 +22,7 @@ void menu_main(WINDOW *main_window) {
     MenuOption selectedIndex = START;
 
     // Create buttons
-    startButton = make_btn("START", 0);
+    startButton = make_btn("NEW GAME" , 0);
     savesButton = make_btn("LOAD", 1);
     settingsButton = make_btn("CONFIG", 2);
     quitButton = make_btn("EXIT", 3);
@@ -34,8 +34,9 @@ void menu_main(WINDOW *main_window) {
     wbkgd(buttons[selectedIndex], BUTTON_SELECT_COLOR);
     wrefresh(buttons[selectedIndex]);
 
-    // Process Input
+    // Input Loop
     while (1) {
+        timeout(1000);
         int key = getch();
 
         // Corrected info_log call
@@ -89,8 +90,10 @@ void menu_main(WINDOW *main_window) {
                         }
                         break;
                     case SAVES:
+                        info_log("!!! Not Implemented !!!");
                         break;
                     case SETTINGS:
+                        info_log("!!! Not Implemented !!!");
                         break;
                     case QUIT:
                         for (int i = 0; i < 4; i++) {
@@ -101,15 +104,6 @@ void menu_main(WINDOW *main_window) {
                         break;
                 }
                 break;
-            case 27:
-                for (int i = 0; i < 4; i++) {
-                    delwin(buttons[i]);
-                }
-                endwin();
-
-                exit(0);
-                break;
-
         }
     }
     // TODO make clean up function
@@ -118,7 +112,6 @@ void menu_main(WINDOW *main_window) {
         delwin(buttons[i]);
     }
     endwin();
-
 }
 
 // Create new menu button at correct position with text
