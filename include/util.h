@@ -7,6 +7,8 @@
 #define BUTTON_SELECT_COLOR 3
 #define KEY_COLOR 4
 #define CONTROLS_SCREEN_COLOR 5
+#define STAT_TEXT_COLOR 6
+#define ENTRY_SELECT_COLOR 7
 
 WINDOW *create_newwin(int height, int width, int starty, int startx, int color);
 void destroy_win(WINDOW *local_win);

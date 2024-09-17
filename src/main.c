@@ -37,6 +37,8 @@ int main(void) {
     init_pair(BUTTON_COLOR, COLOR_CYAN, COLOR_BLACK);
     init_pair(KEY_COLOR, COLOR_BLACK, COLOR_WHITE);
     init_pair(CONTROLS_SCREEN_COLOR, COLOR_WHITE, COLOR_BLACK);
+    init_pair(STAT_TEXT_COLOR, COLOR_GREEN, COLOR_BLUE);
+    init_pair(ENTRY_SELECT_COLOR, COLOR_BLUE, COLOR_BLACK);
 
     refresh();
     // Create main window
