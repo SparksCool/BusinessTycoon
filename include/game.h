@@ -12,9 +12,9 @@ struct Employee {
 
 struct Property {
     char name[50];           // Name of the property (e.g., Office, Factory)
-    double value;            // Value of the property
+    int value;               // Value of the property
     int capacity;            // Capacity (e.g., how many employees it can house)
-    double maintenance_cost; // Cost of maintaining the property
+    int maintenance_cost;    // Cost of maintaining the property
     int productivity_bonus;  // Bonus to productivity if this property improves production
 };
 

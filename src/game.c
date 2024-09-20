@@ -6,7 +6,46 @@
 #include <sys/time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
+// Generate a specific number of businesses
+struct Business *populateBusinesses(int count) {
+    struct Business *businesses = malloc(sizeof(struct Business) * count);
+
+    for (int i = 0; i < count; i++) {
+        // Create random business
+        snprintf(&businesses[i].name, sizeof(businesses[i].name), "%s", get_rand_name(TARGET_BUSINESS));
+        businesses[i].balance = rand() % 10000;
+        businesses[i].total_employees = 0;
+        businesses[i].employees = NULL;
+        businesses[i].properties = NULL;
+        businesses[i].revenue = rand() % 600;
+        businesses[i].expenses = 0.0;
+        businesses[i].production_capacity = 100;
+    }
+
+
+    return businesses;
+}
+
+// Generate a number of properties
+struct Property *populateProperties(int count) {
+    struct Property *properties = malloc(sizeof(struct Property) * count);
+    srand(time(NULL) * count);
+
+
+    for (int i = 0; i < count; i++) {
+        // Generate random property
+        snprintf(properties[i].name, sizeof(properties[i].name), "%s", get_rand_name(TARGET_PROPERTY));
+        double productivity = rand() % 10000;
+        properties[i].productivity_bonus = productivity;
+        properties[i].capacity = rand() % 10;
+        properties[i].value = productivity * ( 1 + (rand() % 2));
+        properties[i].maintenance_cost = properties[i].productivity_bonus / 10;
+    }
+
+    return properties;
+}
 
 void game_main() {
     // Game variables
@@ -27,13 +66,13 @@ void game_main() {
         .level = 1,                             // Starting level of the business
         .stock_value = 200.0                    // Placeholder stock value
     };
-    const int propertyCount = 2;
-    const int businessCount = 2;
-    struct Business businesses[businessCount] = {}; // will be loaded by JSON file preset, all businesses in the world
-    struct Property properties[propertyCount] = {}; // will be loaded by JSON file preset, Public pool of properties
+    const int propertyCount = 8;
+    const int businessCount = 5;
+    struct Business *businesses = populateBusinesses(businessCount); // all businesses in the world
+    struct Property *properties = populateProperties(propertyCount); // Public pool of properties
     int selectedIndex = 0;
-    int menuPage = 0;
-    int currentDay = 0;
+    int selectedPage = 0;
+    size_t currentDay = 0;
     float timeFromLastDay = 0;
     float frameTime = 0.0f; // Time in milliseconds between each game loop
     struct timeval frameStart, frameEnd;
@@ -42,10 +81,6 @@ void game_main() {
     struct Menu *activeMenu;
     struct Menu mainMenu;
     struct Menu propertyMenu;
-    
-    // Placeholder properties
-    snprintf(properties[0].name, sizeof(properties[0].name), "Silly Town");
-    snprintf(properties[1].name, sizeof(properties[1].name), "Goof Factory");
 
     // Main Menu
     INIT_MENU(mainMenu, 4);
@@ -111,7 +146,7 @@ void game_main() {
     wattroff(controlsWindow, COLOR_PAIR(CONTROLS_SCREEN_COLOR));
 
     wattron(controlsWindow, COLOR_PAIR(KEY_COLOR));
-    wprintw(controlsWindow, "F5");
+    wprintw(controlsWindow, "F8");
     wattroff(controlsWindow, COLOR_PAIR(KEY_COLOR));
 
 
@@ -187,6 +222,26 @@ void game_main() {
 
         /* Selected Stats */
 
+        TargetType entryTarget = activeMenu->entries[selectedIndex].target_type;
+        int ss_line = dw_lines / 2;
+
+        switch (entryTarget) {
+            struct Business selectedBusiness;
+            struct Property selectedProperty;
+
+            case TARGET_BUSINESS:
+                break;
+            case TARGET_PROPERTY:
+                selectedProperty = *activeMenu->entries[selectedIndex].target.target_property;
+                mvwprintw(detailsWindow, ss_line + 1, 1, "Name: %s", selectedProperty.name);
+                mvwprintw(detailsWindow, ss_line + 2, 1, "Value: %d", selectedProperty.value);
+                mvwprintw(detailsWindow, ss_line + 3, 1, "Productivity: %d", selectedProperty.productivity_bonus);
+                mvwprintw(detailsWindow, ss_line + 4, 1, "Upkeep: %d", selectedProperty.maintenance_cost);
+                break;
+            default:
+                break;
+        }
+
         // Refresh window
         wrefresh(detailsWindow);
 
@@ -222,6 +277,18 @@ void game_main() {
         timeout(1);
         int key = getch();
         struct MenuEntry selectedEntry;
+
+        // Used for saving
+        struct saveData data = {
+            .player = player,
+            .businesses = businesses,
+            .properties = properties,
+            .currentDay = currentDay,
+            .business_num = businessCount,
+            .property_num = propertyCount
+        };
+        char * filename[1024];
+
         switch (key) {
             case KEY_DOWN:
                 if (selectedIndex + 1 > activeMenu->entry_num - 1) selectedIndex = 0;
@@ -257,6 +324,12 @@ void game_main() {
                 DESTROY_MENU(propertyMenu);
 
                 return;
+                break;
+            case KEY_F(8):
+                // Save game
+                snprintf(filename, sizeof(filename), "%s-%zu", player.business.name, currentDay);
+                write_save(data, filename);
+
                 break;
         }
 
