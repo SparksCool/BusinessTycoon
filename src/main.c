@@ -39,6 +39,7 @@ int main(void) {
     init_pair(CONTROLS_SCREEN_COLOR, COLOR_WHITE, COLOR_BLACK);
     init_pair(STAT_TEXT_COLOR, COLOR_GREEN, COLOR_BLUE);
     init_pair(ENTRY_SELECT_COLOR, COLOR_BLUE, COLOR_BLACK);
+    init_pair(STAT_SELECT_TEXT_COLOR, COLOR_RED, COLOR_BLUE);
 
     refresh();
     // Create main window

@@ -81,12 +81,13 @@ void game_main() {
     struct Menu *activeMenu;
     struct Menu mainMenu;
     struct Menu propertyMenu;
+    struct Menu businessMenu;
 
     // Main Menu
     INIT_MENU(mainMenu, 4);
     ADD_MENU_ENTRY(mainMenu, 0, OPEN, TARGET_MENU, &propertyMenu, "Buy Property"); // Open properties menu button
     ADD_MENU_ENTRY(mainMenu, 1, OPEN, TARGET_BUSINESS, &propertyMenu, "Manage Property"); // Open property management menu button
-    ADD_MENU_ENTRY(mainMenu, 2, OPEN, TARGET_NONE, &player.business, "View Rival Companies"); // View other companies
+    ADD_MENU_ENTRY(mainMenu, 2, OPEN, TARGET_MENU, &businessMenu, "View Rival Companies"); // View other companies
     ADD_MENU_ENTRY(mainMenu, 3, OPEN, TARGET_BUSINESS, &player.business, "Customize Company"); // Customization options, e.g name
 
     // Properties Menu(s)
@@ -95,6 +96,14 @@ void game_main() {
         ADD_MENU_ENTRY(propertyMenu, i, BUY, TARGET_PROPERTY, &properties[i], properties[i].name);
     }
     ADD_MENU_ENTRY(propertyMenu, propertyCount, OPEN, TARGET_MENU, &mainMenu, "Back");
+
+    // Business Menu(s)
+    INIT_MENU(businessMenu, businessCount + 1);
+    for (int i = 0; i < businessCount; i++) {
+        ADD_MENU_ENTRY(businessMenu, i, OPEN, TARGET_BUSINESS, &businesses[i], businesses[i].name);
+    }
+    ADD_MENU_ENTRY(businessMenu, businessCount, OPEN, TARGET_MENU, &mainMenu, "Back");
+
 
     // Windows
     WINDOW *controlsWindow = create_newwin(3, COLS, LINES - 3, 0, SCREEN_COLOR);
@@ -221,6 +230,8 @@ void game_main() {
         wattroff(detailsWindow, A_BOLD);
 
         /* Selected Stats */
+        wattron(detailsWindow, COLOR_PAIR(STAT_SELECT_TEXT_COLOR));
+        wattron(detailsWindow, A_BOLD);
 
         TargetType entryTarget = activeMenu->entries[selectedIndex].target_type;
         int ss_line = dw_lines / 2;
@@ -230,6 +241,11 @@ void game_main() {
             struct Property selectedProperty;
 
             case TARGET_BUSINESS:
+                selectedBusiness = *activeMenu->entries[selectedIndex].target.target_business;
+                mvwprintw(detailsWindow, ss_line + 1, 1, "Name: %s", selectedBusiness.name);
+                mvwprintw(detailsWindow, ss_line + 2, 1, "Balance: $%.0f", selectedBusiness.balance);
+                mvwprintw(detailsWindow, ss_line + 3, 1, "Production: %d", selectedBusiness.production_capacity);
+                mvwprintw(detailsWindow, ss_line + 4, 1, "Properties: %d", selectedBusiness.properties);
                 break;
             case TARGET_PROPERTY:
                 selectedProperty = *activeMenu->entries[selectedIndex].target.target_property;
@@ -241,6 +257,9 @@ void game_main() {
             default:
                 break;
         }
+
+        wattroff(detailsWindow, COLOR_PAIR(STAT_SELECT_TEXT_COLOR));
+        wattroff(detailsWindow, A_BOLD);
 
         // Refresh window
         wrefresh(detailsWindow);

@@ -10,6 +10,7 @@
 #define CONTROLS_SCREEN_COLOR 5
 #define STAT_TEXT_COLOR 6
 #define ENTRY_SELECT_COLOR 7
+#define STAT_SELECT_TEXT_COLOR 8
 
 struct saveData {
     struct PlayerBusiness player;
