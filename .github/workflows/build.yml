@@ -1,0 +1,29 @@
+name: Build C Project
+
+# Trigger the workflow on push to any branch
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Install dependencies like Clang and Ncurses
+      - name: Install Clang and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang ncurses-dev
+
+      # Step 3: Build the project using the same command from tasks.json
+      - name: Build project
+        run: |
+          clang -fcolor-diagnostics -fansi-escape-codes -g \
+          -I./include -I/usr/local/include ./src/*.c \
+          -lncurses -o ./bin/main
