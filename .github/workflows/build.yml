@@ -10,28 +10,29 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    # Use the Docker container you specified to run the build
-    container:
-      image: ghcr.io/${{ github.repository_owner }}/${{ github.repository_name }}:latest # Change this if you're using a different Docker image source.
-      options: --user vscode
-
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Docker
+      # Step 2: Install dependencies like Clang and Ncurses
+      - name: Install Clang and dependencies
         run: |
-          docker build -t BusinessTycoon .
+          sudo apt-get update
+          sudo apt-get install -y clang ncurses-dev
 
-      - name: Build project using tasks.json configuration
+      # Step 3: Build the project using the same command from tasks.json
+      - name: Build project
         run: |
           clang -fcolor-diagnostics -fansi-escape-codes -g \
           -I./include -I/usr/local/include ./src/*.c \
           -lncurses -o ./bin/main
 
-      - name: Verify build
+      # Step 4: Verify the build (you can remove this if not needed)
+      - name: Run the built binary
         run: ./bin/main
 
+      # Step 5: Upload build artifacts if needed
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
