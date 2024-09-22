@@ -27,14 +27,3 @@ jobs:
           clang -fcolor-diagnostics -fansi-escape-codes -g \
           -I./include -I/usr/local/include ./src/*.c \
           -lncurses -o ./bin/main
-
-      # Step 4: Verify the build (you can remove this if not needed)
-      - name: Run the built binary
-        run: ./bin/main
-
-      # Step 5: Upload build artifacts if needed
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: main-executable
-          path: ./bin/main
