@@ -66,8 +66,8 @@ void game_main() {
         .level = 1,                             // Starting level of the business
         .stock_value = 200.0                    // Placeholder stock value
     };
-    const int propertyCount = 8;
-    const int businessCount = 5;
+    const int propertyCount = 59;
+    const int businessCount = 30;
     struct Business *businesses = populateBusinesses(businessCount); // all businesses in the world
     struct Property *properties = populateProperties(propertyCount); // Public pool of properties
     int selectedIndex = 0;
@@ -76,6 +76,7 @@ void game_main() {
     float timeFromLastDay = 0;
     float frameTime = 0.0f; // Time in milliseconds between each game loop
     struct timeval frameStart, frameEnd;
+    int pageSize = 10;
 
     // Standard game menus
     struct Menu *activeMenu;
@@ -95,14 +96,12 @@ void game_main() {
     for (int i = 0; i < propertyCount; i++) {
         ADD_MENU_ENTRY(propertyMenu, i, BUY, TARGET_PROPERTY, &properties[i], properties[i].name);
     }
-    ADD_MENU_ENTRY(propertyMenu, propertyCount, OPEN, TARGET_MENU, &mainMenu, "Back");
 
     // Business Menu(s)
     INIT_MENU(businessMenu, businessCount + 1);
     for (int i = 0; i < businessCount; i++) {
         ADD_MENU_ENTRY(businessMenu, i, OPEN, TARGET_BUSINESS, &businesses[i], businesses[i].name);
     }
-    ADD_MENU_ENTRY(businessMenu, businessCount, OPEN, TARGET_MENU, &mainMenu, "Back");
 
 
     // Windows
@@ -133,14 +132,44 @@ void game_main() {
     wattron(controlsWindow, COLOR_PAIR(KEY_COLOR));
     waddch(controlsWindow, ACS_DARROW);
     wattroff(controlsWindow, COLOR_PAIR(KEY_COLOR));
+
+    // Prev Page
+    wattron(controlsWindow, COLOR_PAIR(CONTROLS_SCREEN_COLOR));
+    wprintw(controlsWindow, " Prev Page: ");
+    wattroff(controlsWindow, COLOR_PAIR(CONTROLS_SCREEN_COLOR));
+
+    wattron(controlsWindow, COLOR_PAIR(KEY_COLOR));
+    waddch(controlsWindow, ACS_LARROW);
+    wattroff(controlsWindow, COLOR_PAIR(KEY_COLOR));
+
+    // Next Page
+    wattron(controlsWindow, COLOR_PAIR(CONTROLS_SCREEN_COLOR));
+    wprintw(controlsWindow, " Next Page: ");
+    wattroff(controlsWindow, COLOR_PAIR(CONTROLS_SCREEN_COLOR));
+
+    wattron(controlsWindow, COLOR_PAIR(KEY_COLOR));
+    waddch(controlsWindow, ACS_RARROW);
+    wattroff(controlsWindow, COLOR_PAIR(KEY_COLOR));
+
+
     // Exit to Menu Control
     wattron(controlsWindow, COLOR_PAIR(CONTROLS_SCREEN_COLOR));
-    wprintw(controlsWindow, " Exit to Menu: ");
+    wprintw(controlsWindow, " Exit Game: ");
     wattroff(controlsWindow, COLOR_PAIR(CONTROLS_SCREEN_COLOR));
 
     wattron(controlsWindow, COLOR_PAIR(KEY_COLOR));
     wprintw(controlsWindow, "ESC");
     wattroff(controlsWindow, COLOR_PAIR(KEY_COLOR));
+
+    // Exit to Menu Control
+    wattron(controlsWindow, COLOR_PAIR(CONTROLS_SCREEN_COLOR));
+    wprintw(controlsWindow, " Main Menu: ");
+    wattroff(controlsWindow, COLOR_PAIR(CONTROLS_SCREEN_COLOR));
+
+    wattron(controlsWindow, COLOR_PAIR(KEY_COLOR));
+    wprintw(controlsWindow, "TAB");
+    wattroff(controlsWindow, COLOR_PAIR(KEY_COLOR));
+
     // Activate Control
     wattron(controlsWindow, COLOR_PAIR(CONTROLS_SCREEN_COLOR));
     wprintw(controlsWindow, " Activate: ");
@@ -186,6 +215,8 @@ void game_main() {
     // Game loop
     while(1) {
         gettimeofday(&frameStart, NULL);
+        int pageSelectedIndex = selectedIndex + pageSize * selectedPage;
+        int currentPageSize;
 
         if (timeFromLastDay > 5000) {
             timeFromLastDay = 0;
@@ -233,7 +264,7 @@ void game_main() {
         wattron(detailsWindow, COLOR_PAIR(STAT_SELECT_TEXT_COLOR));
         wattron(detailsWindow, A_BOLD);
 
-        TargetType entryTarget = activeMenu->entries[selectedIndex].target_type;
+        TargetType entryTarget = activeMenu->entries[pageSelectedIndex].target_type;
         int ss_line = dw_lines / 2;
 
         switch (entryTarget) {
@@ -241,14 +272,14 @@ void game_main() {
             struct Property selectedProperty;
 
             case TARGET_BUSINESS:
-                selectedBusiness = *activeMenu->entries[selectedIndex].target.target_business;
+                selectedBusiness = *activeMenu->entries[pageSelectedIndex].target.target_business;
                 mvwprintw(detailsWindow, ss_line + 1, 1, "Name: %s", selectedBusiness.name);
                 mvwprintw(detailsWindow, ss_line + 2, 1, "Balance: $%.0f", selectedBusiness.balance);
                 mvwprintw(detailsWindow, ss_line + 3, 1, "Production: %d", selectedBusiness.production_capacity);
                 mvwprintw(detailsWindow, ss_line + 4, 1, "Properties: %d", selectedBusiness.properties);
                 break;
             case TARGET_PROPERTY:
-                selectedProperty = *activeMenu->entries[selectedIndex].target.target_property;
+                selectedProperty = *activeMenu->entries[pageSelectedIndex].target.target_property;
                 mvwprintw(detailsWindow, ss_line + 1, 1, "Name: %s", selectedProperty.name);
                 mvwprintw(detailsWindow, ss_line + 2, 1, "Value: %d", selectedProperty.value);
                 mvwprintw(detailsWindow, ss_line + 3, 1, "Productivity: %d", selectedProperty.productivity_bonus);
@@ -277,16 +308,22 @@ void game_main() {
         box(mainWindow, 0, 0);
 
         // Populate menu with active menu
-        for (int i = 0; i < activeMenu->entry_num; i++) {
+        for (int i = 0; (i + pageSize * selectedPage) < activeMenu->entry_num && i < pageSize; i++) {
+            int index = i + pageSize * selectedPage;
             int menu_width = mw_cols - 15;
             char spaces[menu_width];
-            int text_size = strlen(activeMenu->entries[i].name);
+            int text_size = strlen(activeMenu->entries[index].name);
             memset(spaces, ' ', menu_width - text_size);
             spaces[(menu_width - text_size)] = '\0';
 
             if (selectedIndex == i) wattron(mainWindow, COLOR_PAIR(ENTRY_SELECT_COLOR));
-            mvwprintw(mainWindow, 1 + i, 1, "%s%s", activeMenu->entries[i].name, spaces);
+            mvwprintw(mainWindow, 1 + i, 1, "%s%s", activeMenu->entries[index].name, spaces);
             if (selectedIndex == i) wattroff(mainWindow,COLOR_PAIR(ENTRY_SELECT_COLOR));
+            currentPageSize++;
+        }
+
+        if (activeMenu->entry_num > pageSize) {
+            mvwprintw(mainWindow, mw_lines - 2, 1, "Page %d of %d", selectedPage + 1, ((activeMenu->entry_num + 1) / pageSize));
         }
 
         // Refresh window
@@ -307,15 +344,33 @@ void game_main() {
             .property_num = propertyCount
         };
         char * filename[1024];
+        int pageEntriesMax = pageSize;
+        // Make sure we dont divide by zero (very scary)
+        if (selectedPage > 0) {
+            activeMenu->entry_num % selectedPage;
+            if (pageEntriesMax > pageSize) pageEntriesMax = pageSize;
+        }
+
+        if (pageEntriesMax > activeMenu->entry_num) pageEntriesMax = activeMenu->entry_num;
 
         switch (key) {
             case KEY_DOWN:
-                if (selectedIndex + 1 > activeMenu->entry_num - 1) selectedIndex = 0;
+                if (selectedIndex + 1 > activeMenu->entry_num - 1 || selectedIndex + 1 > pageEntriesMax - 1) selectedIndex = 0;
                 else selectedIndex += 1;
                 break;
             case KEY_UP:
-                if (selectedIndex - 1 < 0) selectedIndex = activeMenu->entry_num - 1;
+                if (selectedIndex - 1 < 0) selectedIndex = pageEntriesMax - 1;
                 else selectedIndex -= 1;
+                break;
+            case KEY_LEFT:
+                if (selectedPage - 1 < 0) selectedPage = ((activeMenu->entry_num + 1) / pageSize);
+                else selectedPage -=1;
+                selectedIndex = 0;
+                break;
+            case KEY_RIGHT:
+                if (selectedPage + 1 > ((activeMenu->entry_num + 1) / pageSize) - 1) selectedPage = 0;
+                else selectedPage +=1;
+                selectedIndex = 0;
                 break;
             case 10:
                 selectedEntry = activeMenu->entries[selectedIndex];
@@ -324,6 +379,7 @@ void game_main() {
                     case OPEN:
                         if (selectedEntry.target_type == TARGET_MENU) {
                             selectedIndex = 0;
+                            selectedPage = 0;
                             activeMenu = selectedEntry.target.target_menu;
                         }
                         break;
@@ -349,6 +405,11 @@ void game_main() {
                 snprintf(filename, sizeof(filename), "%s-%zu", player.business.name, currentDay);
                 write_save(data, filename);
 
+                break;
+            case 9:
+                selectedIndex = 0;
+                selectedPage = 0;
+                activeMenu = &mainMenu;
                 break;
         }
 

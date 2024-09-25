@@ -14,8 +14,6 @@ typedef enum {
 } MenuOption;
 
 
-WINDOW *make_btn(const char * text, int position);
-
 // Init the main menu
 void menu_main(WINDOW *main_window) {
     WINDOW *startButton, *savesButton, *settingsButton, *quitButton;
