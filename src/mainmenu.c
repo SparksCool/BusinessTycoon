@@ -1,6 +1,7 @@
 #include "mainmenu.h"
 #include "util.h"
 #include "game.h"
+#include "saves.h"
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
@@ -88,7 +89,15 @@ void menu_main(WINDOW *main_window) {
                         }
                         break;
                     case SAVES:
-                        info_log("!!! Not Implemented !!!");
+                        saves_menu();
+
+                        // Make sure the main menu actually shows up again
+                        touchwin(main_window);
+                        wrefresh(main_window);
+                        for (int i = 0; i < 4; i++) {
+                            touchwin(buttons[i]);
+                            wrefresh(buttons[i]);
+                        }
                         break;
                     case SETTINGS:
                         info_log("!!! Not Implemented !!!");

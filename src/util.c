@@ -2,6 +2,8 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <dirent.h>
 
 #define MAX_NAME_LINES 2048
 

@@ -215,7 +215,9 @@ void game_main() {
     // Game loop
     while(1) {
         gettimeofday(&frameStart, NULL);
+        // The selected entry relative to the current page
         int pageSelectedIndex = selectedIndex + pageSize * selectedPage;
+        // The full size of the current page
         int currentPageSize;
 
         if (timeFromLastDay > 5000) {
@@ -351,6 +353,7 @@ void game_main() {
             if (pageEntriesMax > pageSize) pageEntriesMax = pageSize;
         }
 
+        // Set max page entries to number of entries in the active menu, if they are less then the standard max entries
         if (pageEntriesMax > activeMenu->entry_num) pageEntriesMax = activeMenu->entry_num;
 
         switch (key) {
@@ -363,7 +366,7 @@ void game_main() {
                 else selectedIndex -= 1;
                 break;
             case KEY_LEFT:
-                if (selectedPage - 1 < 0) selectedPage = ((activeMenu->entry_num + 1) / pageSize);
+                if (selectedPage - 1 < 0) selectedPage = ((activeMenu->entry_num + 1) / pageSize) - 1;
                 else selectedPage -=1;
                 selectedIndex = 0;
                 break;
