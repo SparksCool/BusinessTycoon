@@ -47,9 +47,17 @@ struct Property *populateProperties(int count) {
     return properties;
 }
 
-void game_main() {
-    // Game variables
-    struct PlayerBusiness player = {
+void new_game() {
+    int businessCount = 30;
+    int propertyCount = 59;
+
+    struct SaveData data = {
+        .business_num = businessCount,
+        .property_num = propertyCount,
+        .businesses = populateBusinesses(businessCount),
+        .properties = populateProperties(propertyCount),
+        .currentDay = 0,
+        .player = {
         .business = {
             .name = "Player Company",           // Placeholder name
             .balance = 10000.0,                 // Initial financial balance
@@ -65,14 +73,22 @@ void game_main() {
         .reputation = 50,                       // Initial reputation (on a 0-100 scale)
         .level = 1,                             // Starting level of the business
         .stock_value = 200.0                    // Placeholder stock value
+    }   
     };
-    const int propertyCount = 59;
-    const int businessCount = 30;
-    struct Business *businesses = populateBusinesses(businessCount); // all businesses in the world
-    struct Property *properties = populateProperties(propertyCount); // Public pool of properties
+
+    game_main(data);
+}
+
+void game_main(struct SaveData loadedSave) {
+    // Game variables
+    struct PlayerBusiness player = loadedSave.player;
+    const int propertyCount = loadedSave.property_num;
+    const int businessCount = loadedSave.business_num;
+    struct Business *businesses = loadedSave.businesses; // all businesses in the world
+    struct Property *properties = loadedSave.properties; // Public pool of properties
     int selectedIndex = 0;
     int selectedPage = 0;
-    size_t currentDay = 0;
+    size_t currentDay = loadedSave.currentDay;
     float timeFromLastDay = 0;
     float frameTime = 0.0f; // Time in milliseconds between each game loop
     struct timeval frameStart, frameEnd;
@@ -337,7 +353,7 @@ void game_main() {
         struct MenuEntry selectedEntry;
 
         // Used for saving
-        struct saveData data = {
+        struct SaveData data = {
             .player = player,
             .businesses = businesses,
             .properties = properties,

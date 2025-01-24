@@ -78,7 +78,7 @@ void menu_main(WINDOW *main_window) {
                 // User has activated selected button
                 switch (selectedIndex) {
                     case START:
-                        game_main();
+                        new_game();
 
                         // Make sure the main menu actually shows up again
                         touchwin(main_window);

@@ -33,6 +33,7 @@ void destroy_win(WINDOW *local_win)
 void info_log(const char * text, ...) {
     char buffer[1024];
 
+    // These are macros which allow the special formatting to be applied in arguments e.g %s and %d
     va_list args;
     va_start(args, text);
     vsnprintf(buffer, sizeof(buffer), text, args);
@@ -48,14 +49,14 @@ void info_log(const char * text, ...) {
 }
 
 // Read save data
-struct saveData read_save(const char * filename_) { 
+struct SaveData read_save(const char * filename_) { 
     // Save data
     struct PlayerBusiness player;
-    struct Business *businesses;
-    struct Property *properties;
-    size_t day;
-    size_t business_num;
-    size_t property_num;
+    struct Business *businesses = NULL;
+    struct Property *properties = NULL;
+    size_t day = 0;
+    size_t business_num = 0;
+    size_t property_num = 0;
     char filename[256];
 
     snprintf(filename, sizeof(filename), "saves/%s", filename_);
@@ -64,21 +65,25 @@ struct saveData read_save(const char * filename_) {
     // Open file
     FILE *of;
     of = fopen(filename, "r");
-    if (of == NULL) {info_log("Invalid file!"); struct saveData data = {}; return data;}
+    if (of == NULL) {info_log("Invalid file!"); struct SaveData data = {}; return data;}
 
     // Read data
     fread(&player, sizeof(struct PlayerBusiness), 1, of);
     fread(&business_num, sizeof(size_t), 1, of);
     fread(&property_num, sizeof(size_t), 1, of);
-    fread(businesses, sizeof(struct Business) * business_num, 1, of);
-    fread(properties, sizeof(struct Property) * property_num, 1, of);
+
+    businesses = malloc(sizeof(struct Business) * business_num);
+    properties = malloc(sizeof(struct Property) * property_num);
+
+    fread(businesses, sizeof(struct Business), business_num, of);
+    fread(properties, sizeof(struct Property), property_num, of);
     if (&fread != 0) {
         info_log("Save loaded!");
     } else {
         info_log("Error reading file!");
     }
 
-    struct saveData data = {
+    struct SaveData data = {
         .player = player,
         .businesses = businesses,
         .properties = properties,
@@ -93,7 +98,7 @@ struct saveData read_save(const char * filename_) {
 }
 
 // Write save data
-void write_save(struct saveData data, const char * filename_) {
+void write_save(struct SaveData data, const char * filename_) {
     // Save data
     struct PlayerBusiness player = data.player;
     struct Business *businesses = data.businesses;
@@ -114,8 +119,8 @@ void write_save(struct saveData data, const char * filename_) {
     fwrite(&player, sizeof(player), 1, of);
     fwrite(&business_num, sizeof(size_t), 1, of);
     fwrite(&property_num, sizeof(size_t), 1, of);
-    fwrite(businesses, sizeof(businesses), 1, of);
-    fwrite(properties, sizeof(properties), 1, of);
+    fwrite(businesses, sizeof(struct Business), business_num, of);
+    fwrite(properties, sizeof(struct Property), property_num, of);
     fwrite(&day, sizeof(size_t), 1, of);
     if (&fwrite != 0) {
         info_log("Save %s created!", filename);

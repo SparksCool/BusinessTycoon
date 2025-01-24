@@ -103,4 +103,5 @@ struct Menu {
     free(menu.entries[index].name);
 
 void game_main();
+void new_game();
 #endif

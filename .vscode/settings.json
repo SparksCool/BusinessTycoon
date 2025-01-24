@@ -4,7 +4,8 @@
         "menu.h": "c",
         "typeinfo": "cpp",
         "game.h": "c",
-        "ncurses.h": "c"
+        "ncurses.h": "c",
+        "util.h": "c"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/clang"
 }

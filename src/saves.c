@@ -101,13 +101,26 @@ void saves_menu() {
             memset(spaces, ' ', menu_width - text_size);
             spaces[(menu_width - text_size)] = '\0';
 
+            if (selectedIndex == i) wattron(mainWindow, COLOR_PAIR(ENTRY_SELECT_COLOR));
             mvwprintw(mainWindow, 1 + i, 1, "%s%s", saveMenu->entries[i].saveName, spaces);
+            if (selectedIndex == i) wattroff(mainWindow, COLOR_PAIR(ENTRY_SELECT_COLOR));
         }
 
         // Refresh
         wrefresh(mainWindow);
 
         switch (key) {
+            case KEY_DOWN:
+                if (selectedIndex < saveMenu->menuSize - 1) selectedIndex += 1;
+                break;
+            case KEY_UP:
+                if (selectedIndex > 0) selectedIndex -= 1;
+                break;
+            case 10:
+            // Load save
+            game_main(read_save(saveMenu->entries[selectedIndex].saveName));
+            
+            break;
             case 27:
                 delwin(controlsWindow);
                 delwin(detailsWindow);

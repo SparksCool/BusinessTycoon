@@ -12,7 +12,7 @@
 #define ENTRY_SELECT_COLOR 7
 #define STAT_SELECT_TEXT_COLOR 8
 
-struct saveData {
+struct SaveData {
     struct PlayerBusiness player;
     struct Business *businesses;
     struct Property *properties;
@@ -24,7 +24,7 @@ struct saveData {
 WINDOW *create_newwin(int height, int width, int starty, int startx, int color);
 void destroy_win(WINDOW *local_win);
 void info_log(const char * text, ...);
-struct saveData read_save(const char * filename);
-void write_save(struct saveData data, const char * filename);
+struct SaveData read_save(const char * filename);
+void write_save(struct SaveData data, const char * filename);
 char * get_rand_name(TargetType type);
 #endif // UTIL_H
