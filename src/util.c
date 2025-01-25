@@ -77,6 +77,7 @@ struct SaveData read_save(const char * filename_) {
 
     fread(businesses, sizeof(struct Business), business_num, of);
     fread(properties, sizeof(struct Property), property_num, of);
+    fread(&day, sizeof(size_t), 1, of);
     if (&fread != 0) {
         info_log("Save loaded!");
     } else {
